@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { userModel } from "../models/user";
+import { createHash, validatePassword } from "../utils/bcrypt";
 
 const sessionRouter = Router()
 
@@ -8,7 +9,7 @@ sessionRouter.get('/login', async (req, res) => {
 
     try {
         const user = await userModel.findOne({ email: email }).lean()
-        if (user && password == user.password) {
+        if (user && validatePassword(password, user.password)) {
             req.session.email = email
             if (user.rol == "Admin") {
                 req.session.admin = true
@@ -31,7 +32,7 @@ sessionRouter.post('/register', async (req, res) => {
         if (findUser) {
             res.status(400).send("Ya existe un usuario con este mail")
         } else {
-            await userModel.create({ first_name, last_name, email, age, password })
+            await userModel.create({ first_name: first_name, last_name: last_name, email: email, age: age, password: createHash(password) })
             res.status(200).send("Usuario creado correctamente")
         }
 
