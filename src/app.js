@@ -3,10 +3,11 @@ import mongoose from 'mongoose'
 import session from 'express-session'
 
 import MongoStore from 'connect-mongo'
-
+import passport from 'passport'
 import cookieParser from 'cookie-parser'
 import messageModel from './models/messages.js'
 import indexRouter from './routes/indexRouter.js'
+import initializePassport from './config/passport/passport.js'
 import { Server } from 'socket.io'
 import { engine } from 'express-handlebars'
 import { __dirname } from './path.js'
@@ -45,12 +46,17 @@ app.use(session({
     saveUninitialized: true
 }))
 
-
 app.use(cookieParser("MiClaveSecreta"))
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', __dirname + '/views')
- 
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
+//ROutes
+
 app.use('/', indexRouter)
 
 app.use(session({
