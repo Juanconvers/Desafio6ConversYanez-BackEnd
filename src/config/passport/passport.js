@@ -1,6 +1,7 @@
 import local from 'passport-local'
 import passport from 'passport'
 import GithubStrategy from 'passport-github2'
+import crypto from 'crypto'
 import { userModel } from '../../models/user.js'
 import { createHash, validatePassword } from '../../utils/bcrypt.js'
 
@@ -59,7 +60,7 @@ const initializePassport = () => {
                 console.log(profile._json)
                 const userCreated = await userModel.create({ first_name: profile._json.name, last_name: ' ', email: profile._json.email, age: 18, password: createHash(`${profile._json.name}`) })
                 console.log(randomNumber)
-                return done (null, userCreated)
+                return done(null, userCreated)
             }
         } catch (error){
             return done(error)
